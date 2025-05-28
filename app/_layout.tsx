@@ -5,8 +5,11 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { AuthProvider } from '@/context/login/login.context';
+import { ThemeProvider as RestyleThemeProvider } from '@shopify/restyle';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { darkTheme, lightTheme } from '@/theme/theme.global';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -15,7 +18,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: '/login',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -46,14 +49,23 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  // Mover a lógica do tema para DENTRO desta função
   const colorScheme = useColorScheme();
 
+  // Agora as variáveis estão no escopo correto
+  const navigationTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+  const restyleTheme = colorScheme === 'dark' ? darkTheme : lightTheme;
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={navigationTheme}>
+        <RestyleThemeProvider theme={restyleTheme}>
+          <Stack>
+            <Stack.Screen name="(protected)" options={{ headerShown: false }} />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+          </Stack>
+        </RestyleThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
