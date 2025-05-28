@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 
 interface Login {
     isLogged: boolean;
+    isReady: boolean;
     login: (username:string, password:string) => void;
     logout: () => void;
 }
@@ -18,13 +19,14 @@ interface LoginProviderProps {
 
 export const AuthProvider = ({children}: LoginProviderProps) => {
     const [isLogged, setIsLoggedIn] = useState(false)
+    const [isReady, setIsReady] = useState(false);
     const router = useRouter();
 
     async function storeAuthState (newState: {isLoggedin:boolean}) {
       try{
         await AsyncStorage.setItem("loged",JSON.stringify(newState));
-      }catch{
-
+      }catch(error){
+        console.log(error);
       }
     }
 
@@ -41,22 +43,30 @@ export const AuthProvider = ({children}: LoginProviderProps) => {
         setIsLoggedIn(false);
         storeAuthState({isLoggedin: false})
         console.log("Usuario deslogado com sucesso!");
-        router.replace("/login");
+        //router.replace("/login");
     }
 
     useEffect(() => {
-      async function loadAuthState(){
-        const authState = await AsyncStorage.getItem("loged");
-        if(authState){
-          setIsLoggedIn(JSON.parse(authState));
-        }      
-      }
+      
+        async function loadAuthState(){
+          try{
+          const authState = await AsyncStorage.getItem("loged");
+          if(authState){
+            setIsLoggedIn(JSON.parse(authState));
+          }      
+          }catch(error){
+            console.log(error);
+          }finally{
+            setIsReady(true);
+          }            
+        }
       loadAuthState();
     },[])
 
     return (
         <AuthContext.Provider value={{
           isLogged,
+          isReady,
           login,
           logout
         }}>

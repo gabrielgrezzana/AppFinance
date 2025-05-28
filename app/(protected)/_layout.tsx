@@ -8,9 +8,12 @@ import { useAuth } from '@/context/login/login.context';
 
 export default function ProtectedLayout() {
   const colorScheme = useColorScheme();
-  const {isLogged} = useAuth();
+  const {isLogged , isReady} = useAuth();
 
-  console.log(isLogged)
+  if(!isReady){
+    return null;
+  }
+
   if(!isLogged){
     return <Redirect href="/login" />;
   }

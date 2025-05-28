@@ -2,56 +2,19 @@ import {TextInput, Button, SafeAreaView} from "react-native";
 import { useAuth } from "@/context/login/login.context";
 import Box from "@/atoms/box";
 import Text from "@/atoms/text";
-import { useState, useEffect } from "react";
-//import Login from "@/class/class.login";
+import { useState } from "react";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const {login,isLogged,logout} = useAuth();
+    const {login} = useAuth();
     const router = useRouter();
 
-    const handlelogin = async (): Promise<void> => {
-        console.log("username", username, "password",password);
-       // const login = new Login({ username, password });
-       // const response = await login.login();                
+    const handlelogin = async (): Promise<void> => {                    
         login(username, password);
         router.replace("/(protected)/(tabs)");
-    }
-
-    useEffect(() => {
-        const checkLogin = async () => {
-            const isLoggedFromStorage = await checkloginfromstorage();
-            console.log("Login from storage:", isLoggedFromStorage);
-            
-            // Se estiver logado, você pode redirecionar ou atualizar o estado
-            if (isLoggedFromStorage) {
-                
-                router.replace("/(protected)/(tabs)");
-                // Opção 1: Redirecionar direto
-                // router.replace("/(protected)/(tabs)");
-                
-                // Opção 2: Atualizar o contexto (se tiver uma função para isso)
-                // login(savedUsername, savedPassword); // ou alguma função de restore session
-            }
-        };
-        
-        checkLogin();
-    }, []);
-
-    const checkloginfromstorage = async (): Promise<boolean> => {
-        const logged = await  AsyncStorage.getItem("loged");
-        if(logged !== null){
-            const islogged = JSON.parse(logged);
-            return islogged;
-        }else{
-            return false;
-        }
-        return false;
-    }
-
+    }    
 
         return (
             <SafeAreaView style={{flex:1}}>
@@ -62,8 +25,7 @@ export default function LoginScreen() {
                         <Text>password:</Text>
                         <TextInput secureTextEntry={true} onChangeText={(text) => setPassword(text)} style={{width:"90%" , height:"10%", backgroundColor:"#ccc"}}></TextInput>                        
                     </Box>
-                    <Button title="Login" color={"black"} onPress={handlelogin}/>
-                    
+                    <Button title="Login" color={"black"} onPress={handlelogin}/>                    
                 </Box>                
             </SafeAreaView>
         );
